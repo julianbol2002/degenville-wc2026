@@ -1,0 +1,26 @@
+{
+  "r16": [
+    { "id": 17, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 18, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 19, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 20, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 21, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 22, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 23, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 24, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null }
+  ],
+  "qf": [
+    { "id": 25, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 26, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 27, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 28, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null }
+  ],
+  "sf": [
+    { "id": 29, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null },
+    { "id": 30, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null }
+  ],
+  "final": [
+    { "id": 31, "team1": "", "team2": "", "actual_t1": null, "actual_t2": null }
+  ],
+  "champion": ""
+}

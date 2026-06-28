@@ -28,7 +28,7 @@ export default function AutoRefresh({ lastUpdated }: AutoRefreshProps) {
   }, [lastUpdated, router]);
 
   return (
-    <span className="text-sm text-slate-400">
+    <span className="text-sm text-secondary transition-colors duration-300">
       Last updated {secondsAgo}s ago
     </span>
   );

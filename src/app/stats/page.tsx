@@ -1,33 +1,32 @@
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
-import AllPicksGrid from "@/components/AllPicksGrid";
+import StatsDashboard from "@/components/StatsDashboard";
 import AutoRefresh from "@/components/AutoRefresh";
 import { getAppData } from "@/lib/data";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "All Picks",
-  description: "Full grid of every participant pick for all 16 Round of 32 games.",
+  title: "Stats",
+  description: "Advanced statistics, fun leaderboards, and rank movement charts for Degenville WC 2026.",
 };
 
-export default async function AllPicksPage() {
+export default async function StatsPage() {
   const data = await getAppData();
 
   return (
     <div className="min-h-screen bg-bg transition-colors duration-300">
       <SiteHeader
-        activePath="/picks"
+        activePath="/stats"
         stale={data.stale}
         rightSlot={<AutoRefresh lastUpdated={data.lastUpdated} />}
       />
       <main className="page-enter mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h2 className="mb-2 text-2xl font-bold text-primary">All Picks</h2>
+        <h2 className="mb-2 text-2xl font-bold text-primary">Stats & Analytics</h2>
         <p className="mb-8 text-secondary">
-          Every prediction across all 17 participants — green = correct winner, gold = exact score,
-          red = wrong, 👑 = sole correct pick.
+          Deep dive into group performance, fun awards, and rank trends over the tournament.
         </p>
-        <AllPicksGrid data={data} />
+        <StatsDashboard data={data} />
       </main>
     </div>
   );

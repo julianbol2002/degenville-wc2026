@@ -1,17 +1,19 @@
+import Flag from "./Flag";
 import type { Game, Participant } from "@/lib/types";
 import { getPickResult, getResultLabel } from "@/lib/scoring";
+import { cumulativeGradient } from "@/lib/stats-utils";
 
 function rowClass(result: ReturnType<typeof getPickResult>): string {
   switch (result) {
     case "exact":
       return "bg-gold/15";
     case "winner":
-      return "bg-green-500/10";
+      return "bg-correct/10";
     case "wrong":
-      return "bg-red-500/10";
+      return "bg-wrong/10";
     case "pending":
     case "unpicked":
-      return "bg-slate-50";
+      return "bg-card";
   }
 }
 
@@ -30,13 +32,14 @@ export default function ParticipantPicksTable({
   games,
 }: ParticipantPicksTableProps) {
   let cumulative = 0;
+  const maxPossible = games.filter((g) => g.status === "Done").length * 9;
 
   return (
-    <div className="overflow-hidden rounded-xl bg-white shadow-md">
+    <div className="glass-card overflow-hidden rounded-xl shadow-md">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead>
-            <tr className="border-b border-slate-200 bg-navy text-xs uppercase tracking-wider text-white">
+            <tr className="border-b border-border bg-navy text-xs uppercase tracking-wider text-paper">
               <th className="px-4 py-3">#</th>
               <th className="px-4 py-3">Teams</th>
               <th className="px-4 py-3">Their Pick</th>
@@ -57,14 +60,24 @@ export default function ParticipantPicksTable({
               if (game.status === "Done") {
                 cumulative += pick?.points ?? 0;
               }
+              const progress = maxPossible > 0 ? cumulative / maxPossible : 0;
 
               return (
-                <tr key={game.id} className={`border-b border-slate-100 ${rowClass(result)}`}>
-                  <td className="px-4 py-3 font-medium">{game.id}</td>
+                <tr
+                  key={game.id}
+                  className={`border-b border-border/50 transition-colors duration-300 ${rowClass(result)}`}
+                >
+                  <td className="px-4 py-3 font-medium text-primary">{game.id}</td>
                   <td className="px-4 py-3">
-                    {game.team1} vs {game.team2}
+                    <div className="flex items-center gap-2">
+                      <Flag team={game.team1} size={24} />
+                      <span className="text-primary">{game.team1}</span>
+                      <span className="text-secondary">vs</span>
+                      <Flag team={game.team2} size={24} />
+                      <span className="text-primary">{game.team2}</span>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 font-semibold">
+                  <td className="px-4 py-3 font-semibold text-primary">
                     {formatScore(pick?.predT1 ?? null, pick?.predT2 ?? null)}
                   </td>
                   <td className="px-4 py-3 font-semibold text-teal">
@@ -72,14 +85,20 @@ export default function ParticipantPicksTable({
                       ? formatScore(game.actualT1, game.actualT2)
                       : "—"}
                   </td>
-                  <td className="px-4 py-3 font-bold">
+                  <td className="px-4 py-3 font-bold text-primary">
                     {game.status === "Done" ? pick?.points ?? 0 : "—"}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-primary">
                     {result === "exact" && <span className="mr-1">⭐</span>}
                     {getResultLabel(result)}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-teal">
+                  <td
+                    className="px-4 py-3 text-right font-bold"
+                    style={{
+                      color:
+                        game.status === "Done" ? cumulativeGradient(progress) : undefined,
+                    }}
+                  >
                     {game.status === "Done" ? cumulative : "—"}
                   </td>
                 </tr>

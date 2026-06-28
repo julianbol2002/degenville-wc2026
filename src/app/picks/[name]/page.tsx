@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
-import BonusPicks from "@/components/BonusPicks";
+import ParticipantProfile from "@/components/ParticipantProfile";
 import ParticipantPicksTable from "@/components/ParticipantPicksTable";
+import HeadToHead from "@/components/HeadToHead";
 import BackLink from "@/components/BackLink";
 import AutoRefresh from "@/components/AutoRefresh";
 import { getAppData } from "@/lib/data";
@@ -17,11 +19,12 @@ interface PageProps {
   params: { name: string };
 }
 
-function rankBadge(rank: number): string {
-  if (rank === 1) return "🥇 1st";
-  if (rank === 2) return "🥈 2nd";
-  if (rank === 3) return "🥉 3rd";
-  return `#${rank}`;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const config = getParticipantBySlug(params.name);
+  return {
+    title: config?.displayName ?? "Participant",
+    description: `${config?.displayName ?? "Participant"} picks and stats for Degenville World Cup 2026.`,
+  };
 }
 
 export default async function ParticipantPage({ params }: PageProps) {
@@ -33,7 +36,7 @@ export default async function ParticipantPage({ params }: PageProps) {
   if (!participant) notFound();
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-bg transition-colors duration-300">
       <SiteHeader
         activePath="/picks"
         stale={data.stale}
@@ -44,27 +47,16 @@ export default async function ParticipantPage({ params }: PageProps) {
           <BackLink />
         </div>
 
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-navy">{participant.displayName}</h2>
-            <span className="mt-2 inline-block rounded-full bg-teal-light px-3 py-1 text-sm font-semibold text-teal">
-              {rankBadge(participant.rank)}
-            </span>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-slate">Total Points</p>
-            <p className="text-4xl font-bold text-teal">{participant.totalPoints}</p>
-          </div>
-        </div>
+        <ParticipantProfile participant={participant} games={data.games} />
 
-        <BonusPicks
-          championPick={participant.championPick}
-          finalist1={participant.finalist1}
-          finalist2={participant.finalist2}
-        />
-
-        <h3 className="mb-4 text-lg font-bold text-navy">Game-by-Game Picks</h3>
+        <h3 className="mb-4 text-lg font-bold text-primary">Game-by-Game Picks</h3>
         <ParticipantPicksTable participant={participant} games={data.games} />
+
+        <HeadToHead
+          participant={participant}
+          others={data.participants}
+          games={data.games}
+        />
       </main>
     </div>
   );
