@@ -2,7 +2,6 @@ import { assignRanks } from "./scoring";
 import { getCachedData, setCachedData } from "./cache";
 import { PARTICIPANTS, getParticipantConfig } from "./participants";
 import {
-  fetchWorkbook,
   getParticipantTabNames,
   parseParticipantSheet,
   parseResultsSheet,
@@ -19,7 +18,6 @@ function emptyFallbackData(): AppData {
     actualT2: null,
     status: "Pending" as const,
   }));
-
   const participants: Participant[] = PARTICIPANTS.map((config, i) => ({
     tabName: config.tabName,
     displayName: config.displayName,
@@ -38,7 +36,6 @@ function emptyFallbackData(): AppData {
     avgPointsPerGame: 0,
     gamesScored: 0,
   }));
-
   return {
     lastUpdated: new Date().toISOString(),
     games,
@@ -49,9 +46,8 @@ function emptyFallbackData(): AppData {
 
 export async function getAppData(): Promise<AppData> {
   try {
-    const workbook = await fetchWorkbook();
-    const games = parseResultsSheet(workbook);
-    const tabNames = getParticipantTabNames(workbook);
+    const games = await parseResultsSheet();
+    const tabNames = getParticipantTabNames();
 
     const participantResults = await Promise.all(
       tabNames.map(async (tabName) => {
@@ -61,12 +57,10 @@ export async function getAppData(): Promise<AppData> {
             console.warn(`No participant config for tab ${tabName}, skipping`);
             return null;
           }
-
-          const parsed = parseParticipantSheet(workbook, tabName, games);
+          const parsed = await parseParticipantSheet(config.csvUrl, games);
           const totalPoints = parsed.picks.reduce((sum, p) => sum + p.points, 0);
           const gamesScored = games.filter((g) => g.status === "Done").length;
           const avgPointsPerGame = gamesScored > 0 ? totalPoints / gamesScored : 0;
-
           const participant: Participant = {
             tabName: config.tabName,
             displayName: config.displayName,
@@ -80,7 +74,6 @@ export async function getAppData(): Promise<AppData> {
             avgPointsPerGame,
             gamesScored,
           };
-
           return participant;
         } catch (err) {
           console.error(`Error parsing participant ${tabName}:`, err);
