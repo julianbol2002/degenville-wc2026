@@ -7,7 +7,7 @@ ESPN-style World Cup 2026 bracket, leaderboard, and picks tracker for the Degenv
 - Next.js 14 (App Router)
 - TypeScript
 - Tailwind CSS
-- Google Sheets (published CSV) as the single source of truth
+- Google Sheets (published XLSX workbook) as the single source of truth
 
 ## Getting Started
 
@@ -24,10 +24,10 @@ Open [http://localhost:3000](http://localhost:3000).
 Create `.env.local`:
 
 ```
-SHEET_BASE_URL=https://docs.google.com/spreadsheets/d/e/2PACX-1vSs07VSIpzIgfg5-7lz45Bal_fOCRoV1aJWjt9r9MbJFdQqUeYhov5_0FQEUwncVJKQQdjudRk9h9aR/pub?output=csv
+SHEET_BASE_URL=https://docs.google.com/spreadsheets/d/e/2PACX-1vSs07VSIpzIgfg5-7lz45Bal_fOCRoV1aJWjt9r9MbJFdQqUeYhov5_0FQEUwncVJKQQdjudRk9h9aR/pub?output=xlsx
 ```
 
-Individual tabs are fetched by appending `&sheet=SHEET_NAME` to this base URL.
+The app downloads the full published workbook in one request and reads each participant tab plus the Results tab.
 
 ## Updating Data (No Redeploy Required)
 
@@ -79,7 +79,7 @@ Score and pick updates in the sheet propagate to production within 60 seconds �
 ## Data Flow
 
 ```
-Google Sheet → published CSV → /api/data → React pages
+Google Sheet → published XLSX → /api/data → React pages
 ```
 
 No authentication, database, or external state management — the sheet is the only thing that ever needs editing.

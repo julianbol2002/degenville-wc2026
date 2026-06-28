@@ -1,27 +1,28 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #f0f4f8;
+  --bg: #f5f5f5;
   --card: #ffffff;
-  --border: #e2e8f0;
-  --text-primary: #0f1f2e;
-  --text-secondary: #4a6572;
-  --teal: #2a9d8f;
-  --gold: #ffd700;
-  --green-correct: #22c55e;
-  --red-wrong: #ef4444;
+  --border: #dddddd;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --espn-red: #cc0000;
+  --espn-red-dark: #990000;
+  --accent: #cc0000;
+  --green-correct: #008248;
+  --red-wrong: #cc0000;
 }
 
 .dark {
-  --bg: #0a1628;
-  --card: #0f1f2e;
-  --border: #1a2b4c;
-  --text-primary: #f7f5f0;
-  --text-secondary: #94a3b8;
+  --bg: #0d0d0d;
+  --card: #1a1a1a;
+  --border: #333333;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
 }
 
 html {
@@ -31,8 +32,20 @@ html {
 body {
   color: var(--text-primary);
   background: var(--bg);
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Roboto Condensed", system-ui, sans-serif;
   transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: "Oswald", "Roboto Condensed", sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 @keyframes fade-in {
@@ -52,15 +65,6 @@ body {
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
   }
 }
 
@@ -93,17 +97,6 @@ body {
   }
 }
 
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(-10px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(80px) rotate(360deg);
-    opacity: 0;
-  }
-}
-
 @keyframes draw-line {
   from {
     stroke-dashoffset: 100;
@@ -133,62 +126,44 @@ body {
   animation: ticker 40s linear infinite;
 }
 
-.shimmer-gold {
-  background: linear-gradient(90deg, #b8860b, #ffd700, #fff8dc, #ffd700, #b8860b);
-  background-size: 200% auto;
-  animation: shimmer 2.5s linear infinite;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.shimmer-silver {
-  background: linear-gradient(90deg, #808080, #c0c0c0, #e8e8e8, #c0c0c0, #808080);
-  background-size: 200% auto;
-  animation: shimmer 2.5s linear infinite;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.shimmer-bronze {
-  background: linear-gradient(90deg, #8b4513, #cd7f32, #daa520, #cd7f32, #8b4513);
-  background-size: 200% auto;
-  animation: shimmer 2.5s linear infinite;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .glass-card {
   border: 1px solid var(--border);
-  background-color: color-mix(in srgb, var(--card) 85%, transparent);
-  backdrop-filter: blur(12px);
+  background-color: var(--card);
   transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.dark .glass-card {
-  box-shadow: 0 0 20px rgba(42, 157, 143, 0.08);
-}
-
 .hero-gradient {
-  background: linear-gradient(135deg, #0a1628 0%, #0f1f2e 40%, #1a4d4a 70%, #2a9d8f 100%);
+  background: linear-gradient(180deg, #000000 0%, #1a1a1a 55%, #cc0000 100%);
 }
 
 .hero-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='14' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.06'/%3E%3Cpath d='M30 16 L34 26 L44 26 L36 32 L40 42 L30 36 L20 42 L24 32 L16 26 L26 26 Z' fill='%23ffffff' opacity='0.04'/%3E%3C/svg%3E");
-  background-size: 60px 60px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 12px,
+    rgba(255, 255, 255, 0.03) 12px,
+    rgba(255, 255, 255, 0.03) 24px
+  );
 }
 
-.gold-glow {
-  box-shadow: 0 0 24px rgba(255, 215, 0, 0.35), inset 0 0 12px rgba(255, 215, 0, 0.1);
+.espn-header {
+  background: #000000;
+  border-bottom: 4px solid #cc0000;
 }
 
-.confetti-piece {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  animation: confetti-fall 2s ease-in infinite;
+.rank-badge-1 {
+  background: #cc0000;
+  color: #ffffff;
+}
+
+.rank-badge-2 {
+  background: #333333;
+  color: #ffffff;
+}
+
+.rank-badge-3 {
+  background: #666666;
+  color: #ffffff;
 }
 
 .chart-line {
@@ -201,4 +176,14 @@ body {
   border-radius: 0.5rem;
   background-color: color-mix(in srgb, var(--border) 60%, transparent);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.espn-table-head {
+  background: #000000;
+  color: #ffffff;
+}
+
+.espn-table-head th {
+  font-family: "Oswald", sans-serif;
+  letter-spacing: 0.08em;
 }

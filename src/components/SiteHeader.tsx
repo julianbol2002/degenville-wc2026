@@ -25,24 +25,29 @@ export default function SiteHeader({
   hero = false,
 }: SiteHeaderProps) {
   const headerClass = hero
-    ? "hero-gradient hero-pattern text-white shadow-xl"
-    : "border-b border-border bg-card text-primary shadow-lg transition-colors duration-300";
+    ? "espn-header hero-gradient hero-pattern text-white"
+    : "espn-header text-white";
 
   return (
     <div className="sticky top-0 z-50">
       <header className={headerClass}>
-        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">DEGENVILLE 🌍</h1>
-              <p className={`mt-1 text-lg font-semibold sm:text-xl ${hero ? "text-teal-light" : "text-teal"}`}>
+              <p className="font-display text-xs font-semibold tracking-[0.35em] text-espn-red">
+                DEGENVILLE FC
+              </p>
+              <h1 className="font-display text-4xl font-bold leading-none tracking-wide sm:text-5xl">
                 WORLD CUP 2026
+              </h1>
+              <p className="mt-1 text-sm uppercase tracking-widest text-white/70">
+                Bracket Challenge
               </p>
             </div>
             <div className="flex items-center gap-3 sm:items-center">
               {rightSlot}
               {stale && (
-                <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-300">
+                <span className="rounded bg-white/10 px-3 py-1 text-xs font-medium text-white">
                   Data may be outdated
                 </span>
               )}
@@ -50,7 +55,7 @@ export default function SiteHeader({
             </div>
           </div>
 
-          <nav className="mt-5 flex flex-wrap gap-6 border-t border-white/10 pt-4">
+          <nav className="mt-4 flex flex-wrap gap-5 border-t border-white/10 pt-3">
             {links.map((link) => {
               const isActive =
                 link.href === "/"
@@ -60,12 +65,10 @@ export default function SiteHeader({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`pb-1 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:text-teal ${
+                  className={`font-display pb-1 text-sm font-semibold uppercase tracking-wider transition-colors duration-300 hover:text-espn-red ${
                     isActive
-                      ? "border-b-2 border-teal text-teal"
-                      : hero
-                        ? "text-white/70"
-                        : "text-secondary"
+                      ? "border-b-2 border-espn-red text-espn-red"
+                      : "text-white/75"
                   }`}
                 >
                   {link.label}

@@ -16,7 +16,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0A1628 0%, #0F1F2E 50%, #1A3A4A 100%)",
+          background: "linear-gradient(180deg, #000000 0%, #1A1A1A 60%, #CC0000 100%)",
           fontFamily: "sans-serif",
           position: "relative",
           overflow: "hidden",
@@ -25,24 +25,11 @@ export default async function Image() {
         <div
           style={{
             position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "400px",
-            height: "400px",
-            borderRadius: "50%",
-            background: "rgba(42, 157, 143, 0.15)",
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-100px",
-            left: "-60px",
-            width: "350px",
-            height: "350px",
-            borderRadius: "50%",
-            background: "rgba(42, 157, 143, 0.08)",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "8px",
+            background: "#CC0000",
             display: "flex",
           }}
         />
@@ -50,19 +37,19 @@ export default async function Image() {
         <div
           style={{
             display: "flex",
-            background: "rgba(42, 157, 143, 0.2)",
-            border: "1px solid rgba(42, 157, 143, 0.5)",
-            borderRadius: "999px",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            borderRadius: "4px",
             padding: "8px 24px",
             marginBottom: "24px",
-            color: "#2A9D8F",
+            color: "#FFFFFF",
             fontSize: "22px",
-            fontWeight: "600",
-            letterSpacing: "3px",
+            fontWeight: "700",
+            letterSpacing: "4px",
             textTransform: "uppercase",
           }}
         >
-          ⚽ Bracket Challenge
+          Bracket Challenge
         </div>
 
         <div
@@ -79,7 +66,7 @@ export default async function Image() {
               fontSize: "96px",
               fontWeight: "900",
               color: "#FFFFFF",
-              letterSpacing: "-2px",
+              letterSpacing: "-1px",
               lineHeight: 1,
             }}
           >
@@ -89,25 +76,17 @@ export default async function Image() {
             style={{
               fontSize: "48px",
               fontWeight: "700",
-              background: "linear-gradient(90deg, #2A9D8F, #FFD700)",
-              backgroundClip: "text",
-              color: "transparent",
-              letterSpacing: "6px",
+              color: "#CC0000",
+              letterSpacing: "8px",
             }}
           >
             WORLD CUP 2026
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "40px",
-            marginBottom: "40px",
-          }}
-        >
+        <div style={{ display: "flex", gap: "40px", marginBottom: "40px" }}>
           {[
-            { label: "Players", value: "17" },
+            { label: "Players", value: "18" },
             { label: "Games", value: "16" },
             { label: "Prize Pool", value: "$340" },
           ].map((stat) => (
@@ -117,29 +96,23 @@ export default async function Image() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "16px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "8px",
                 padding: "16px 32px",
               }}
             >
-              <div style={{ fontSize: "42px", fontWeight: "800", color: "#FFD700" }}>
+              <div style={{ fontSize: "42px", fontWeight: "800", color: "#CC0000" }}>
                 {stat.value}
               </div>
-              <div style={{ fontSize: "18px", color: "#94A3B8", marginTop: "4px" }}>
+              <div style={{ fontSize: "18px", color: "#B3B3B3", marginTop: "4px" }}>
                 {stat.label}
               </div>
             </div>
           ))}
         </div>
 
-        <div
-          style={{
-            fontSize: "22px",
-            color: "rgba(148, 163, 184, 0.8)",
-            letterSpacing: "1px",
-          }}
-        >
+        <div style={{ fontSize: "22px", color: "rgba(255,255,255,0.7)", letterSpacing: "1px" }}>
           degenville-wc2026.vercel.app
         </div>
       </div>

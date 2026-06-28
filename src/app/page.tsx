@@ -30,7 +30,7 @@ export default async function HomePage() {
         totalParticipants={data.participants.length}
       />
       <main className="page-enter mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h2 className="mb-6 text-2xl font-bold text-primary">Leaderboard</h2>
+        <h2 className="font-display mb-6 text-2xl font-bold text-primary">Leaderboard</h2>
         <LeaderboardTable
           participants={data.participants}
           games={data.games}

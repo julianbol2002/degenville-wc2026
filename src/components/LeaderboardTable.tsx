@@ -12,9 +12,27 @@ import {
 } from "@/lib/stats-utils";
 
 function rankDisplay(rank: number): React.ReactNode {
-  if (rank === 1) return <span className="shimmer-gold text-2xl">🥇</span>;
-  if (rank === 2) return <span className="shimmer-silver text-2xl">🥈</span>;
-  if (rank === 3) return <span className="shimmer-bronze text-2xl">🥉</span>;
+  if (rank === 1) {
+    return (
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm bg-espn-red text-sm font-bold text-white">
+        1
+      </span>
+    );
+  }
+  if (rank === 2) {
+    return (
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm bg-neutral-700 text-sm font-bold text-white">
+        2
+      </span>
+    );
+  }
+  if (rank === 3) {
+    return (
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-sm bg-neutral-500 text-sm font-bold text-white">
+        3
+      </span>
+    );
+  }
   return <span className="text-lg font-bold text-primary">{rank}</span>;
 }
 
@@ -95,11 +113,11 @@ export default function LeaderboardTable({
   );
 
   return (
-    <div className="glass-card overflow-hidden rounded-xl shadow-md">
+    <div className="overflow-hidden rounded-sm border border-border bg-card shadow-md">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px] text-left">
           <thead>
-            <tr className="border-b border-border bg-navy text-xs uppercase tracking-wider text-paper">
+            <tr className="espn-table-head text-xs uppercase">
               <th className="px-4 py-3 font-semibold">Rank</th>
               <th className="px-4 py-3 font-semibold">Move</th>
               <th className="px-4 py-3 font-semibold">Name</th>
@@ -113,7 +131,7 @@ export default function LeaderboardTable({
             {enriched.map((p, i) => (
               <tr
                 key={p.slug}
-                className="animate-fade-in border-b border-border/50 transition-colors duration-300 hover:bg-teal/5"
+                className="animate-fade-in border-b border-border/60 transition-colors duration-300 hover:bg-black/5 dark:hover:bg-white/5"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <td className="px-4 py-4">{rankDisplay(p.rank)}</td>
@@ -123,33 +141,29 @@ export default function LeaderboardTable({
                 <td className="px-4 py-4">
                   <Link
                     href={`/picks/${p.slug}`}
-                    className="group inline-flex flex-col gap-1 font-semibold text-primary transition-colors duration-300 hover:text-teal"
+                    className="group inline-flex flex-col gap-1 font-semibold text-primary transition-colors duration-300 hover:text-espn-red"
                   >
                     <span className="group-hover:underline">{p.displayName}</span>
                     {p.streak === "fire" && (
-                      <span className="text-xs font-normal text-orange-500">🔥 On Fire</span>
+                      <span className="text-xs font-normal text-espn-red">HOT STREAK</span>
                     )}
                     {p.streak === "cold" && (
-                      <span className="text-xs font-normal text-blue-400">🥶 Ice Cold</span>
+                      <span className="text-xs font-normal text-secondary">COLD STREAK</span>
                     )}
                   </Link>
                 </td>
                 <td className="px-4 py-4 text-secondary">
                   {p.gamesScored > 0 ? p.avgPointsPerGame.toFixed(1) : "—"}
                 </td>
-                <td className="px-4 py-4 text-secondary">
-                  {p.bestGame > 0 ? (
-                    <span>
-                      ⭐ {p.bestGame}
-                    </span>
-                  ) : (
-                    "—"
-                  )}
+                <td className="px-4 py-4 font-semibold text-primary">
+                  {p.bestGame > 0 ? p.bestGame : "—"}
                 </td>
                 <td className="px-4 py-4">
                   <GameSquares picks={p.picks} games={games} />
                 </td>
-                <td className="px-4 py-4 text-right text-2xl font-bold text-teal">{p.totalPoints}</td>
+                <td className="px-4 py-4 text-right font-display text-2xl font-bold text-espn-red">
+                  {p.totalPoints}
+                </td>
               </tr>
             ))}
           </tbody>

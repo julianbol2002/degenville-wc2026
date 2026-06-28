@@ -7,6 +7,7 @@ export interface ParticipantConfig {
 export const PARTICIPANTS: ParticipantConfig[] = [
   { tabName: "Carson_Russell", displayName: "Carson Russell", slug: "carson-russell" },
   { tabName: "Coleman_Tuck", displayName: "Coleman Tuck", slug: "coleman-tuck" },
+  { tabName: "Julian_Bolanos", displayName: "Julian Bolanos", slug: "julian-bolanos" },
   { tabName: "blake_parkman", displayName: "blake parkman", slug: "blake-parkman" },
   { tabName: "Devin_duCille", displayName: "Devin duCille", slug: "devin-ducille" },
   { tabName: "myles_jones", displayName: "myles jones", slug: "myles-jones" },
@@ -28,4 +29,8 @@ export const RESULTS_TAB = "Results (Enter Here)";
 
 export function getParticipantBySlug(slug: string): ParticipantConfig | undefined {
   return PARTICIPANTS.find((p) => p.slug === slug);
+}
+
+export function getParticipantConfig(tabName: string): ParticipantConfig | undefined {
+  return PARTICIPANTS.find((p) => p.tabName === tabName);
 }

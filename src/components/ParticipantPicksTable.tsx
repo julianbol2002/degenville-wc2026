@@ -39,7 +39,7 @@ export default function ParticipantPicksTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead>
-            <tr className="border-b border-border bg-navy text-xs uppercase tracking-wider text-paper">
+            <tr className="espn-table-head text-xs uppercase tracking-wider text-white">
               <th className="px-4 py-3">#</th>
               <th className="px-4 py-3">Teams</th>
               <th className="px-4 py-3">Their Pick</th>
@@ -80,7 +80,7 @@ export default function ParticipantPicksTable({
                   <td className="px-4 py-3 font-semibold text-primary">
                     {formatScore(pick?.predT1 ?? null, pick?.predT2 ?? null)}
                   </td>
-                  <td className="px-4 py-3 font-semibold text-teal">
+                  <td className="px-4 py-3 font-semibold text-espn-red">
                     {game.status === "Done"
                       ? formatScore(game.actualT1, game.actualT2)
                       : "—"}
@@ -89,7 +89,6 @@ export default function ParticipantPicksTable({
                     {game.status === "Done" ? pick?.points ?? 0 : "—"}
                   </td>
                   <td className="px-4 py-3 text-primary">
-                    {result === "exact" && <span className="mr-1">⭐</span>}
                     {getResultLabel(result)}
                   </td>
                   <td

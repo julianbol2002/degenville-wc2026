@@ -1,17 +1,13 @@
-import { cell, parseCSV, parseNumber } from "./csv";
-import { PARTICIPANTS, RESULTS_TAB } from "./participants";
-import { computePoints, assignRanks } from "./scoring";
+import { assignRanks } from "./scoring";
 import { getCachedData, setCachedData } from "./cache";
-import type { AppData, Game, GamePick, Participant } from "./types";
-
-const FETCH_OPTIONS: RequestInit = { next: { revalidate: 60 } };
-
-function buildSheetUrl(tabName: string): string {
-  const base = process.env.SHEET_BASE_URL;
-  if (!base) throw new Error("SHEET_BASE_URL is not configured");
-  const joiner = base.includes("?") ? "&" : "?";
-  return `${base}${joiner}sheet=${encodeURIComponent(tabName)}`;
-}
+import { PARTICIPANTS, getParticipantConfig } from "./participants";
+import {
+  fetchWorkbook,
+  getParticipantTabNames,
+  parseParticipantSheet,
+  parseResultsSheet,
+} from "./xlsx-sheet";
+import type { AppData, Game, Participant } from "./types";
 
 function emptyFallbackData(): AppData {
   const games: Game[] = Array.from({ length: 16 }, (_, i) => ({
@@ -51,95 +47,22 @@ function emptyFallbackData(): AppData {
   };
 }
 
-async function fetchCSV(tabName: string): Promise<string> {
-  const url = buildSheetUrl(tabName);
-  const res = await fetch(url, FETCH_OPTIONS);
-  if (!res.ok) throw new Error(`Failed to fetch sheet "${tabName}": ${res.status}`);
-  return res.text();
-}
-
-export function parseResultsCSV(csv: string): Game[] {
-  const rows = parseCSV(csv);
-  const games: Game[] = [];
-
-  for (let i = 5; i <= 20; i++) {
-    const row = rows[i];
-    if (!row) continue;
-
-    const id = parseNumber(cell(row, 0));
-    if (id === null) continue;
-
-    const statusRaw = cell(row, 7).toLowerCase();
-    const status = statusRaw === "done" ? "Done" : "Pending";
-
-    games.push({
-      id,
-      date: cell(row, 1),
-      team1: cell(row, 2),
-      team2: cell(row, 4),
-      actualT1: parseNumber(cell(row, 5)),
-      actualT2: parseNumber(cell(row, 6)),
-      status,
-    });
-  }
-
-  return games.sort((a, b) => a.id - b.id);
-}
-
-interface ParsedParticipant {
-  championPick: string | null;
-  finalist1: string | null;
-  finalist2: string | null;
-  picks: GamePick[];
-}
-
-export function parseParticipantCSV(csv: string, games: Game[]): ParsedParticipant {
-  const rows = parseCSV(csv);
-  const bonusRow = rows[1];
-
-  const championPick = cell(bonusRow, 4) || null;
-  const finalist1 = cell(bonusRow, 7) || null;
-  const finalist2 = cell(bonusRow, 8) || null;
-
-  const picks: GamePick[] = [];
-
-  for (let i = 9; i <= 24; i++) {
-    const row = rows[i];
-    if (!row) continue;
-
-    const gameId = parseNumber(cell(row, 0));
-    if (gameId === null) continue;
-
-    const predT1 = parseNumber(cell(row, 4));
-    const predT2 = parseNumber(cell(row, 5));
-
-    const game = games.find((g) => g.id === gameId);
-    const actualT1 = game?.actualT1 ?? parseNumber(cell(row, 6));
-    const actualT2 = game?.actualT2 ?? parseNumber(cell(row, 7));
-
-    const points = computePoints(predT1, predT2, actualT1, actualT2);
-
-    picks.push({ gameId, predT1, predT2, points });
-  }
-
-  return {
-    championPick: championPick || null,
-    finalist1: finalist1 || null,
-    finalist2: finalist2 || null,
-    picks: picks.sort((a, b) => a.gameId - b.gameId),
-  };
-}
-
 export async function getAppData(): Promise<AppData> {
   try {
-    const resultsCSV = await fetchCSV(RESULTS_TAB);
-    const games = parseResultsCSV(resultsCSV);
+    const workbook = await fetchWorkbook();
+    const games = parseResultsSheet(workbook);
+    const tabNames = getParticipantTabNames(workbook);
 
     const participantResults = await Promise.all(
-      PARTICIPANTS.map(async (config) => {
+      tabNames.map(async (tabName) => {
         try {
-          const csv = await fetchCSV(config.tabName);
-          const parsed = parseParticipantCSV(csv, games);
+          const config = getParticipantConfig(tabName);
+          if (!config) {
+            console.warn(`No participant config for tab ${tabName}, skipping`);
+            return null;
+          }
+
+          const parsed = parseParticipantSheet(workbook, tabName, games);
           const totalPoints = parsed.picks.reduce((sum, p) => sum + p.points, 0);
           const gamesScored = games.filter((g) => g.status === "Done").length;
           const avgPointsPerGame = gamesScored > 0 ? totalPoints / gamesScored : 0;
@@ -160,7 +83,7 @@ export async function getAppData(): Promise<AppData> {
 
           return participant;
         } catch (err) {
-          console.error(`Error parsing participant ${config.tabName}:`, err);
+          console.error(`Error parsing participant ${tabName}:`, err);
           return null;
         }
       })
