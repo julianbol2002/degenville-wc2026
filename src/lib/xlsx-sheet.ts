@@ -1,41 +1,32 @@
-import * as XLSX from "xlsx";
 import type { Game, GamePick } from "./types";
 import { computePoints } from "./scoring";
-import { RESULTS_TAB } from "./participants";
-
-const SYSTEM_SHEETS = new Set(["Leaderboard", "Results (Enter Here)", "Rules"]);
+import { PARTICIPANTS, RESULTS_CSV_URL } from "./participants";
 
 const FETCH_OPTIONS: RequestInit = { next: { revalidate: 60 } };
 
-export function getWorkbookUrl(): string {
-  const base = process.env.SHEET_BASE_URL;
-  if (!base) throw new Error("SHEET_BASE_URL is not configured");
-  return base.replace("output=csv", "output=xlsx").replace(/&sheet=[^&]*/g, "");
-}
-
-export async function fetchWorkbook(): Promise<XLSX.WorkBook> {
-  const url = getWorkbookUrl();
+async function fetchCsv(url: string): Promise<string> {
   const res = await fetch(url, { ...FETCH_OPTIONS, redirect: "follow" });
-  if (!res.ok) throw new Error(`Failed to fetch spreadsheet: ${res.status}`);
-  const buffer = await res.arrayBuffer();
-  return XLSX.read(buffer, { type: "array" });
+  if (!res.ok) throw new Error(`Failed to fetch CSV: ${res.status} — ${url}`);
+  return res.text();
 }
 
-export function getParticipantTabNames(workbook: XLSX.WorkBook): string[] {
-  return workbook.SheetNames.filter((name) => !SYSTEM_SHEETS.has(name));
-}
-
-function getSheetRows(workbook: XLSX.WorkBook, sheetName: string): unknown[][] {
-  const sheet = workbook.Sheets[sheetName];
-  if (!sheet) throw new Error(`Sheet not found: ${sheetName}`);
-  return XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true }) as unknown[][];
-}
-
-function cellValue(row: unknown[] | undefined, index: number): string {
-  if (!row || index >= row.length) return "";
-  const value = row[index];
-  if (value === null || value === undefined) return "";
-  return String(value).trim();
+function parseCsv(csv: string): string[][] {
+  const rows: string[][] = [];
+  for (const line of csv.split(/\r?\n/)) {
+    const row: string[] = [];
+    let inQuotes = false;
+    let current = "";
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+      else if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === "," && !inQuotes) { row.push(current.trim()); current = ""; }
+      else { current += ch; }
+    }
+    row.push(current.trim());
+    rows.push(row);
+  }
+  return rows;
 }
 
 export function parseNumberCell(value: unknown): number | null {
@@ -45,28 +36,26 @@ export function parseNumberCell(value: unknown): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
-export function parseResultsSheet(workbook: XLSX.WorkBook): Game[] {
-  const rows = getSheetRows(workbook, RESULTS_TAB);
+export async function parseResultsSheet(): Promise<Game[]> {
+  const csv = await fetchCsv(RESULTS_CSV_URL);
+  const rows = parseCsv(csv);
   const games: Game[] = [];
 
+  // Row 0: title, Row 1: subtitle, Row 2: blank, Row 3: headers, Row 4: blank, Rows 5–20: games
   for (let i = 5; i <= 20; i++) {
-    const row = rows[i] as unknown[] | undefined;
+    const row = rows[i];
     if (!row) continue;
-
     const id = parseNumberCell(row[0]);
     if (id === null) continue;
-
-    const statusRaw = cellValue(row, 7).toLowerCase();
-    const status = statusRaw === "done" ? "Done" : "Pending";
-
+    const statusRaw = (row[7] ?? "").toLowerCase();
     games.push({
       id,
-      date: cellValue(row, 1),
-      team1: cellValue(row, 2),
-      team2: cellValue(row, 4),
+      date: row[1] ?? "",
+      team1: row[2] ?? "",
+      team2: row[4] ?? "",
       actualT1: parseNumberCell(row[5]),
       actualT2: parseNumberCell(row[6]),
-      status,
+      status: statusRaw === "done" ? "Done" : "Pending",
     });
   }
 
@@ -80,46 +69,39 @@ export interface ParsedParticipantSheet {
   picks: GamePick[];
 }
 
-export function parseParticipantSheet(
-  workbook: XLSX.WorkBook,
-  tabName: string,
+export async function parseParticipantSheet(
+  csvUrl: string,
   games: Game[]
-): ParsedParticipantSheet {
-  const rows = getSheetRows(workbook, tabName);
-  const bonusRow = rows[1] as unknown[] | undefined;
+): Promise<ParsedParticipantSheet> {
+  const csv = await fetchCsv(csvUrl);
+  const rows = parseCsv(csv);
 
-  const championPick = cellValue(bonusRow, 4) || null;
-  const finalist1 = cellValue(bonusRow, 7) || null;
-  const finalist2 = cellValue(bonusRow, 8) || null;
+  // Row 1: bonus picks — E=champion, H=finalist1, I=finalist2
+  const bonusRow = rows[1] ?? [];
+  const championPick = bonusRow[4]?.trim() || null;
+  const finalist1 = bonusRow[7]?.trim() || null;
+  const finalist2 = bonusRow[8]?.trim() || null;
 
   const picks: GamePick[] = [];
 
+  // Rows 5–20: game picks
   for (let i = 5; i <= 20; i++) {
-    const row = rows[i] as unknown[] | undefined;
+    const row = rows[i];
     if (!row) continue;
-
     const gameId = parseNumberCell(row[0]);
     if (gameId === null) continue;
-
     const predT1 = parseNumberCell(row[4]);
     const predT2 = parseNumberCell(row[5]);
-
     const game = games.find((g) => g.id === gameId);
-    const actualT1 = game?.actualT1 ?? parseNumberCell(row[6]);
-    const actualT2 = game?.actualT2 ?? parseNumberCell(row[7]);
-
-    picks.push({
-      gameId,
-      predT1,
-      predT2,
-      points: computePoints(predT1, predT2, actualT1, actualT2),
-    });
+    const actualT1 = game?.actualT1 ?? null;
+    const actualT2 = game?.actualT2 ?? null;
+    const points = computePoints(predT1, predT2, actualT1, actualT2);
+    picks.push({ gameId, predT1, predT2, points });
   }
 
-  return {
-    championPick,
-    finalist1,
-    finalist2,
-    picks: picks.sort((a, b) => a.gameId - b.gameId),
-  };
+  return { championPick, finalist1, finalist2, picks };
+}
+
+export function getParticipantTabNames(): string[] {
+  return PARTICIPANTS.map((p) => p.tabName);
 }
