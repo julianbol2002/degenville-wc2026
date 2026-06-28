@@ -5,12 +5,30 @@ import { QueryProvider } from "@/components/QueryProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
-  title: {
-    default: "Degenville World Cup 2026",
-    template: "%s | Degenville WC 2026",
+  title: "Degenville | World Cup 2026",
+  description: "17 friends. 16 games. One bracket. Who called it?",
+  metadataBase: new URL("https://degenville-wc2026.vercel.app"),
+  openGraph: {
+    title: "Degenville | World Cup 2026 Bracket",
+    description: "17 friends. 16 games. One bracket. Who called it?",
+    url: "https://degenville-wc2026.vercel.app",
+    siteName: "Degenville WC2026",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Degenville World Cup 2026 Bracket Challenge",
+      },
+    ],
+    type: "website",
   },
-  description:
-    "ESPN-style World Cup 2026 bracket, leaderboard, and picks tracker for the Degenville friend group.",
+  twitter: {
+    card: "summary_large_image",
+    title: "Degenville | World Cup 2026 Bracket",
+    description: "17 friends. 16 games. One bracket. Who called it?",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function RootLayout({
