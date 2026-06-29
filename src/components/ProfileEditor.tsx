@@ -87,17 +87,19 @@ export default function ProfileEditor({
         className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#0F1F2E] p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           onClick={() => setOpen(false)}
-          className="absolute right-4 top-4 text-xl text-gray-400 hover:text-white"
+          className="absolute right-4 top-4 text-gray-400 hover:text-white transition-colors"
+          aria-label="Close"
         >
-          ✕
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
 
         <h2 className="mb-5 text-lg font-bold text-white">Edit Profile</h2>
 
-        {/* Avatar */}
         <div className="mb-5 flex flex-col items-center gap-3">
           <div
             className="relative h-24 w-24 cursor-pointer overflow-hidden rounded-full border-2 border-[#2A9D8F] bg-neutral-800"
@@ -131,5 +133,52 @@ export default function ProfileEditor({
           />
         </div>
 
-        {/* Name */}
-        <label className="mb-1 block text-xs font-semibold uppercase
+        <label className="mb-1 block text-xs font-semibold uppercase text-gray-400">
+          Display Name
+        </label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={30}
+          className="mb-4 w-full rounded-lg border border-white/10 bg-[#0A1628] px-3 py-2 text-white outline-none focus:border-[#2A9D8F]"
+        />
+
+        {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => setOpen(false)}
+            className="flex-1 rounded-lg border border-white/10 py-2 text-sm text-gray-400 hover:bg-white/5 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving || uploading}
+            className="flex-1 rounded-lg bg-[#2A9D8F] py-2 text-sm font-bold text-white hover:bg-[#2A9D8F]/80 disabled:opacity-50 transition-colors"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="ml-1 text-gray-500 hover:text-white transition-colors"
+        title="Edit profile"
+        aria-label="Edit profile"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </button>
+      {mounted && open && createPortal(modal, document.body)}
+    </>
+  );
+}
