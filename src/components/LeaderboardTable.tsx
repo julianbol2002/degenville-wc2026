@@ -143,24 +143,26 @@ export default function LeaderboardTable({ participants, games, lastUpdated }: L
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <Link
-                        href={`/picks/${p.slug}`}
-                        className="font-semibold text-primary transition-colors duration-300 hover:text-espn-red hover:underline"
-                      >
-                        {p.displayName}
-                      </Link>
+                      <div className="flex items-center gap-1">
+                        <Link
+                          href={`/picks/${p.slug}`}
+                          className="font-semibold text-primary transition-colors duration-300 hover:text-espn-red hover:underline"
+                        >
+                          {p.displayName}
+                        </Link>
+                        <ProfileEditor
+                          slug={p.slug}
+                          currentName={p.displayName}
+                          currentAvatar={p.avatar}
+                          onSave={(name, avatar) => handleProfileSave(p.slug, name, avatar)}
+                        />
+                      </div>
                       {p.streak === "fire" && (
                         <span className="text-xs text-espn-red">🔥 HOT STREAK</span>
                       )}
                       {p.streak === "cold" && (
                         <span className="text-xs text-secondary">🥶 COLD STREAK</span>
                       )}
-                      <ProfileEditor
-                        slug={p.slug}
-                        currentName={p.displayName}
-                        currentAvatar={p.avatar}
-                        onSave={(name, avatar) => handleProfileSave(p.slug, name, avatar)}
-                      />
                     </div>
                   </div>
                 </td>
