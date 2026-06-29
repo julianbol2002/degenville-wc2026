@@ -115,15 +115,15 @@ export default function LeaderboardTable({
   return (
     <div className="overflow-hidden rounded-sm border border-border bg-card shadow-md">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] text-left">
+        <table className="w-full text-left">
           <thead>
             <tr className="espn-table-head text-xs uppercase">
               <th className="px-4 py-3 font-semibold">Rank</th>
               <th className="px-4 py-3 font-semibold">Move</th>
               <th className="px-4 py-3 font-semibold">Name</th>
-              <th className="px-4 py-3 font-semibold">Avg / Game</th>
-              <th className="px-4 py-3 font-semibold">Best</th>
-              <th className="px-4 py-3 font-semibold">Per Game</th>
+              <th className="hidden px-4 py-3 font-semibold sm:table-cell">Avg / Game</th>
+              <th className="hidden px-4 py-3 font-semibold sm:table-cell">Best</th>
+              <th className="hidden px-4 py-3 font-semibold sm:table-cell">Per Game</th>
               <th className="px-4 py-3 text-right font-semibold">Total</th>
             </tr>
           </thead>
@@ -152,13 +152,13 @@ export default function LeaderboardTable({
                     )}
                   </Link>
                 </td>
-                <td className="px-4 py-4 text-secondary">
+                <td className="hidden px-4 py-4 text-secondary sm:table-cell">
                   {p.gamesScored > 0 ? p.avgPointsPerGame.toFixed(1) : "—"}
                 </td>
-                <td className="px-4 py-4 font-semibold text-primary">
+                <td className="hidden px-4 py-4 font-semibold text-primary sm:table-cell">
                   {p.bestGame > 0 ? p.bestGame : "—"}
                 </td>
-                <td className="px-4 py-4">
+                <td className="hidden px-4 py-4 sm:table-cell">
                   <GameSquares picks={p.picks} games={games} />
                 </td>
                 <td className="px-4 py-4 text-right font-display text-2xl font-bold text-espn-red">
