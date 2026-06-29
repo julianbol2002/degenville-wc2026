@@ -66,9 +66,10 @@ export default function ProfileEditor({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="mt-1 text-xs text-secondary underline hover:text-primary transition-colors"
+        className="ml-1 text-secondary hover:text-primary transition-colors"
+        title="Edit profile"
       >
-        Edit profile
+        ✏️
       </button>
 
       {open && (
