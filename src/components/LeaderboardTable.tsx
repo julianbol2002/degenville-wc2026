@@ -11,7 +11,7 @@ import {
   pointsColorClass,
   storePreviousRanks,
 } from "@/lib/stats-utils";
-import { getAllProfiles, upsertProfile, uploadAvatar } from "@/lib/supabase";
+import { getAllProfiles } from "@/lib/supabase";
 import type { DegenProfile } from "@/lib/supabase";
 import ProfileEditor from "@/components/ProfileEditor";
 
@@ -133,7 +133,6 @@ export default function LeaderboardTable({ participants, games, lastUpdated }: L
                 </td>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
-                    {/* Avatar */}
                     <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-border bg-neutral-700">
                       {p.avatar ? (
                         <Image src={p.avatar} alt={p.displayName} fill className="object-cover" />
