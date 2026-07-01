@@ -1,8 +1,12 @@
 import type { Game, GamePick } from "./types";
 import { computePoints } from "./scoring";
 import { PARTICIPANTS, RESULTS_CSV_URL } from "./participants";
+import { parseCSV } from "./csv";
 
 const FETCH_OPTIONS: RequestInit = { next: { revalidate: 60 } };
+
+// Highest game id we expect. Guards against stray numeric rows being read as games.
+const MAX_GAME_ID = 64;
 
 async function fetchCsv(url: string): Promise<string> {
   const res = await fetch(url, { ...FETCH_OPTIONS, redirect: "follow" });
@@ -10,23 +14,13 @@ async function fetchCsv(url: string): Promise<string> {
   return res.text();
 }
 
-function parseCsv(csv: string): string[][] {
-  const rows: string[][] = [];
-  for (const line of csv.split(/\r?\n/)) {
-    const row: string[] = [];
-    let inQuotes = false;
-    let current = "";
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
-      else if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === "," && !inQuotes) { row.push(current.trim()); current = ""; }
-      else { current += ch; }
-    }
-    row.push(current.trim());
-    rows.push(row);
-  }
-  return rows;
+// A row represents a game when its first cell is a positive integer id. This
+// lets us locate games regardless of how many header/title rows precede them —
+// the published CSV has multi-line quoted header cells that shift row indices.
+function parseGameId(value: string | undefined): number | null {
+  const n = parseNumberCell(value);
+  if (n === null || !Number.isInteger(n) || n < 1 || n > MAX_GAME_ID) return null;
+  return n;
 }
 
 export function parseNumberCell(value: unknown): number | null {
@@ -38,14 +32,14 @@ export function parseNumberCell(value: unknown): number | null {
 
 export async function parseResultsSheet(): Promise<Game[]> {
   const csv = await fetchCsv(RESULTS_CSV_URL);
-  const rows = parseCsv(csv);
+  const rows = parseCSV(csv);
   const games: Game[] = [];
 
-  // Row 0: title, Row 1: subtitle, Row 2: blank, Row 3: headers, Row 4: blank, Rows 5–20: games
-  for (let i = 5; i <= 20; i++) {
-    const row = rows[i];
-    if (!row) continue;
-    const id = parseNumberCell(row[0]);
+  // Columns: 0=#, 1=Date, 2=Team 1, 3="vs", 4=Team 2, 5=Actual T1, 6=Actual T2, 7=Status.
+  // Scan by game id rather than fixed row numbers — header cells contain embedded
+  // newlines that shift the row indices unpredictably.
+  for (const row of rows) {
+    const id = parseGameId(row[0]);
     if (id === null) continue;
     const statusRaw = (row[7] ?? "").toLowerCase();
     games.push({
@@ -74,21 +68,22 @@ export async function parseParticipantSheet(
   games: Game[]
 ): Promise<ParsedParticipantSheet> {
   const csv = await fetchCsv(csvUrl);
-  const rows = parseCsv(csv);
+  const rows = parseCSV(csv);
 
-  // Row 1: bonus picks — E=champion, H=finalist1, I=finalist2
-  const bonusRow = rows[1] ?? [];
+  // Bonus picks live on the row containing "Champion Pick:" — E=champion, H=finalist1, I=finalist2.
+  // Find it by content rather than a fixed index in case leading rows shift.
+  const bonusRow =
+    rows.find((r) => r.some((c) => c.toLowerCase().includes("champion pick"))) ?? [];
   const championPick = bonusRow[4]?.trim() || null;
   const finalist1 = bonusRow[7]?.trim() || null;
   const finalist2 = bonusRow[8]?.trim() || null;
 
   const picks: GamePick[] = [];
 
-  // Rows 5–20: game picks
-  for (let i = 5; i <= 20; i++) {
-    const row = rows[i];
-    if (!row) continue;
-    const gameId = parseNumberCell(row[0]);
+  // Columns: 0=#, 1=Team 1, 3=Team 2, 4=Pred T1, 5=Pred T2. Scan by game id rather than
+  // fixed row numbers — header cells contain embedded newlines that shift row indices.
+  for (const row of rows) {
+    const gameId = parseGameId(row[0]);
     if (gameId === null) continue;
     const predT1 = parseNumberCell(row[4]);
     const predT2 = parseNumberCell(row[5]);
