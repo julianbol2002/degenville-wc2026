@@ -33,6 +33,45 @@ export const FLAG_CODES: Record<string, string> = {
   Ghana: "gh",
 };
 
+export const TEAM_ABBR: Record<string, string> = {
+  "South Africa": "RSA",
+  Canada: "CAN",
+  Brazil: "BRA",
+  Japan: "JPN",
+  Germany: "GER",
+  Paraguay: "PAR",
+  Netherlands: "NED",
+  Morocco: "MAR",
+  "Ivory Coast": "CIV",
+  Norway: "NOR",
+  France: "FRA",
+  Sweden: "SWE",
+  Mexico: "MEX",
+  Ecuador: "ECU",
+  USA: "USA",
+  "Bosnia & Herz.": "BIH",
+  Australia: "AUS",
+  Egypt: "EGY",
+  Spain: "ESP",
+  Austria: "AUT",
+  Portugal: "POR",
+  Croatia: "CRO",
+  Algeria: "ALG",
+  Switzerland: "SUI",
+  Senegal: "SEN",
+  Belgium: "BEL",
+  England: "ENG",
+  "DR Congo": "COD",
+  Argentina: "ARG",
+  "Cape Verde": "CPV",
+  Colombia: "COL",
+  Ghana: "GHA",
+};
+
+export function getTeamAbbr(team: string): string {
+  return TEAM_ABBR[team] ?? team.slice(0, 3).toUpperCase();
+}
+
 export function getFlagCode(team: string): string | null {
   return FLAG_CODES[team] ?? null;
 }

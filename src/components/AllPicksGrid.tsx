@@ -5,6 +5,7 @@ import type { AppData } from "@/lib/types";
 import { getPickResult } from "@/lib/scoring";
 import { getConsensusPick, isSoleCorrectPick } from "@/lib/stats-utils";
 import Flag from "./Flag";
+import { getTeamAbbr } from "@/lib/flags";
 
 function cellClass(result: ReturnType<typeof getPickResult>): string {
   switch (result) {
@@ -56,37 +57,38 @@ export default function AllPicksGrid({ data }: AllPicksGridProps) {
             <thead>
               <tr className="bg-navy text-paper">
                 <th className="sticky left-0 top-0 z-20 bg-navy px-3 py-3 text-left font-semibold">
-                  Game
+                  Player
                 </th>
-                {participants.map((p) => (
+                {games.map((game) => (
                   <th
-                    key={p.slug}
-                    className="sticky top-0 z-10 min-w-[72px] bg-navy px-2 py-3 text-center text-xs font-semibold"
+                    key={game.id}
+                    className="sticky top-0 z-10 min-w-[80px] bg-navy px-2 py-3 text-center text-xs font-semibold"
                   >
-                    {p.displayName.split(" ").pop()}
+                    <div>G{game.id}</div>
+                    <div className="mt-1 flex items-center justify-center gap-1 font-normal text-paper/80">
+                      <Flag team={game.team1} size={24} />
+                      <span>{getTeamAbbr(game.team1)}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1 font-normal text-paper/80">
+                      <Flag team={game.team2} size={24} />
+                      <span>{getTeamAbbr(game.team2)}</span>
+                    </div>
+                    {game.status === "Done" && (
+                      <div className="mt-1 font-bold text-teal">
+                        {game.actualT1}-{game.actualT2}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {games.map((game) => (
-                <tr key={game.id} className="border-b border-border/50">
+              {participants.map((p) => (
+                <tr key={p.slug} className="border-b border-border/50">
                   <td className="sticky left-0 z-10 bg-card px-3 py-2 font-medium text-primary">
-                    <div>G{game.id}</div>
-                    <div className="flex flex-wrap items-center gap-1 text-xs text-secondary">
-                      <Flag team={game.team1} size={24} />
-                      {game.team1}
-                      <span>vs</span>
-                      <Flag team={game.team2} size={24} />
-                      {game.team2}
-                    </div>
-                    {game.status === "Done" && (
-                      <div className="text-xs font-bold text-teal">
-                        {game.actualT1}-{game.actualT2}
-                      </div>
-                    )}
+                    {p.displayName.split(" ").pop()}
                   </td>
-                  {participants.map((p) => {
+                  {games.map((game) => {
                     const pick = p.picks.find((pk) => pk.gameId === game.id);
                     const result = getPickResult(
                       pick?.predT1 ?? null,
@@ -96,7 +98,7 @@ export default function AllPicksGrid({ data }: AllPicksGridProps) {
                     const sole = isSoleCorrectPick(game, p.slug, participants);
                     return (
                       <td
-                        key={p.slug}
+                        key={game.id}
                         style={{ backgroundColor: sole ? "#ca8a0433" : cellBg(result) }}
                         className={`relative px-2 py-2 text-center font-semibold transition-colors duration-300 ${cellClass(result)} ${sole ? "ring-1 ring-yellow-500/60" : ""}`}
                       >
@@ -113,18 +115,15 @@ export default function AllPicksGrid({ data }: AllPicksGridProps) {
                 <td className="sticky left-0 z-10 bg-card px-3 py-3 font-semibold text-primary">
                   Consensus
                 </td>
-                <td colSpan={participants.length} className="px-3 py-3">
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-secondary">
-                    {games.map((game) => {
-                      const { pick, pct } = getConsensusPick(game, participants);
-                      return (
-                        <span key={game.id} className="text-primary">
-                          G{game.id}: <strong className="text-teal">{pick}</strong> ({pct}%)
-                        </span>
-                      );
-                    })}
-                  </div>
-                </td>
+                {games.map((game) => {
+                  const { pick, pct } = getConsensusPick(game, participants);
+                  return (
+                    <td key={game.id} className="px-2 py-3 text-center">
+                      <div className="font-semibold text-teal">{pick}</div>
+                      <div className="text-xs text-secondary">{pct}%</div>
+                    </td>
+                  );
+                })}
               </tr>
             </tbody>
           </table>
@@ -176,10 +175,10 @@ export default function AllPicksGrid({ data }: AllPicksGridProps) {
                       <div className="font-medium text-primary">G{game.id}</div>
                       <div className="flex items-center gap-1 text-xs text-secondary">
                         <Flag team={game.team1} size={24} />
-                        {game.team1}
+                        {getTeamAbbr(game.team1)}
                         <span>vs</span>
                         <Flag team={game.team2} size={24} />
-                        {game.team2}
+                        {getTeamAbbr(game.team2)}
                       </div>
                     </td>
                     <td className="px-3 py-3 font-bold text-teal">
